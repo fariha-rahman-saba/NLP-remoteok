@@ -1,0 +1,19 @@
+
+<!-- resumes/templates/resumes/upload.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Resume</title>
+</head>
+<body>
+    <h2>Upload Your Resume</h2>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="resume" accept=".txt,.pdf,.docx" required>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>

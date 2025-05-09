@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scraped LinkedIn Jobs</title>
+</head>
+<body>
+    <h2>Scrape LinkedIn Jobs</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="keyword" placeholder="Job title" required>
+        <input type="text" name="location" placeholder="Location" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h3>Results:</h3>
+    <ul>
+        {% for job in jobs %}
+            <li>
+                <strong>{{ job.title }}</strong> at {{ job.company }} <br>
+                <a href="{{ job.url }}" target="_blank">View Job</a>
+            </li>
+        {% empty %}
+            <li>No jobs found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

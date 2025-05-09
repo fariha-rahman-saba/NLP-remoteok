@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Matches</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .match-card {
+            border: 1px solid #ccc;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+        table { border-collapse: collapse; width: 80%; margin: auto; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h2>Matched Jobs</h2>
+    {% if matches %}
+    <table>
+        <tr>
+            <th>Job Title</th>
+            <th>Matching Score</th>
+        </tr>
+        {% for job in matches %}
+        <tr>
+            <td>{{ job.title }}</td>
+            <td>{{ job.score }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p style="text-align: center;">No strong matches found. Try another resume.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,52 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.swp
+*.swo
+
+# Virtual environment
+venv/
+env/
+*.venv
+*.env
+
+# Django specific
+db.sqlite3
+/media/
+*.log
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Dependencies
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Migrations
+*/migrations/__pycache__/
+*/migrations/*.pyc
+*/migrations/*.pyo
+
+# Environment variables
+.env
+*.env.local
+
+# Node.js (if frontend is included)
+node_modules/
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+*.dylib
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini

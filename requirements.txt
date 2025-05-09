@@ -1,0 +1,18 @@
+# Django & DRF
+Django>=5.1.0,<5.2
+djangorestframework>=3.14.0
+
+# Resume processing (PDF & DOCX)
+python-docx>=1.0.0
+pdfminer.six>=20221105
+
+# NLP
+nltk>=3.8.1
+
+# Other utilities
+chardet>=5.2.0
+
+# Optional: If you use PostgreSQL instead of SQLite
+# psycopg2-binary>=2.9.9
+
+django-cors-headers>=4.3.1

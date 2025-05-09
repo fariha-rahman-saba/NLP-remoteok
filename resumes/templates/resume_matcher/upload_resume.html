@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Matcher</title>
+</head>
+<body>
+    <h1>Upload Your Resume</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form action="{% url 'upload_resume' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+        <button type="submit">Upload and Match</button>
+    </form>
+
+    {% if matched_jobs %}
+        <h2>Matched Jobs:</h2>
+        <ul>
+            {% for job in matched_jobs %}
+                <li>
+                    <strong>{{ job.title }}</strong><br>
+                    {{ job.description }}<br>
+                    <em>Match Score: {{ job.score }}%</em>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
