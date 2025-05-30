@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume Match Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            margin-bottom: 1rem;
+            color: #222;
+        }
+        .job-match {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+        }
+        .job-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .job-description {
+            margin-bottom: 0.5rem;
+        }
+        .match-score {
+            font-weight: bold;
+            color: #007bff;
+        }
+        a.view-job {
+            display: inline-block;
+            margin-top: 0.5rem;
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            padding: 0.3rem 0.7rem;
+            border-radius: 3px;
+        }
+        a.view-job:hover {
+            background-color: #0056b3;
+        }
+        .no-matches {
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>Top Job Matches</h1>
+
+    {% if matched_jobs %}
+        {% for job in matched_jobs %}
+        <div class="job-match">
+            <div class="job-title">{{ job.title }}</div>
+            <div class="job-description">{{ job.description|safe }}</div>
+            <a href="{{ job.url }}" target="_blank" class="view-job">View Job</a>
+            <div class="match-score">Match Score: {{ job.match_score|floatformat:2 }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-matches">No job matches found for the uploaded resume.</p>
+    {% endif %}
+</body>
+</html>

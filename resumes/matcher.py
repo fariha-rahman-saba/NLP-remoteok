@@ -1,3 +1,4 @@
+import requests
 from transformers import BertTokenizer, BertModel
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
@@ -5,11 +6,11 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-# Make sure NLTK is ready
+# Ensure NLTK is prepared
 nltk.download('punkt')
 nltk.download('stopwords')
 
-# Load BERT tokenizer and model only once
+# Load BERT model once
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')
 
@@ -24,20 +25,41 @@ def clean_text(text):
     stop_words = set(stopwords.words('english'))
     return [t for t in tokens if t.isalnum() and t not in stop_words]
 
-def match_resume_with_job_titles(resume_text, job_titles):
-    resume_embedding = get_embedding(resume_text)
-    resume_tokens = clean_text(resume_text)
+def fetch_remoteok_jobs():
+    url = "https://remoteok.com/api"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        jobs = response.json()[1:]  # Skip first metadata element
+        return [{
+            'title': job.get('position') or job.get('title'),
+            'company': job.get('company', ''),
+            'description': job.get('description') or job.get('tags', ''),
+            'url': job.get('url', '')
+        } for job in jobs if job.get('position') or job.get('title')]
+    else:
+        return []
 
-    matched = []
-    for title in job_titles:
+def match_resume_with_jobs(resume_text):
+    resume_embedding = get_embedding(resume_text)
+    matched_jobs = []
+
+    jobs = fetch_remoteok_jobs()  # must return list of dicts!
+
+    for job in jobs:
+        title = job.get('title')
         if not isinstance(title, str) or not title.strip():
-            continue  # skip invalid titles
+            continue
         job_embedding = get_embedding(title)
         similarity = cosine_similarity(resume_embedding, job_embedding)[0][0]
-        if similarity > 0.4:  # Adjust threshold if needed
-            matched.append({
+        if similarity > 0.4:  # Adjust threshold as needed
+            matched_jobs.append({
                 "title": title,
+                "company": job.get('company', ''),
+                "description": job.get('description', ''),
+                "url": job.get('url', ''),
                 "score": round(similarity * 100, 2)
             })
 
-    return matched
+    return matched_jobs

@@ -9,22 +9,12 @@ import pdfminer.high_level
 import docx
 import io
 from .forms import ResumeUploadForm
-# from .matcher import match_resume_with_jobs
 from django.shortcuts import render
 from .scraper import scrape_linkedin_jobs
-from .matcher import match_resume_with_job_titles
 from .scraper import scrape_linkedin_jobs
+from django.shortcuts import render
+from .matcher import match_resume_with_jobs
 
-# Only download if not already
-# try:
-#     nltk.data.find('tokenizers/punkt')
-# except LookupError:
-#     nltk.download('punkt')
-
-# try:
-#     nltk.data.find('corpora/stopwords')
-# except LookupError:
-#     nltk.download('stopwords')
 
 for res in ('punkt', 'punkt_tab'):
     try:
@@ -50,20 +40,6 @@ def extract_text_from_resume(file):
         return f"Error extracting text: {e}"
 
 
-# def upload_resume_view(request):
-#     if request.method == 'POST' and request.FILES.get('resume'):
-#         resume_file = request.FILES['resume']
-#         resume_text = extract_text_from_resume(resume_file)
-
-#         if resume_text.startswith("Error"):
-#             return render(request, 'resume_matcher/upload.html', {'error': resume_text})
-
-#         matched_jobs = match_resume_with_jobs(resume_text)
-
-#         return render(request, 'resume_matcher/result.html', {'matches': matched_jobs})
-
-#     return render(request, 'resume_matcher/upload.html')
-
 def upload_resume_view(request):
     if request.method == 'POST' and request.FILES.get('resume'):
         resume_file = request.FILES['resume']
@@ -72,18 +48,23 @@ def upload_resume_view(request):
         if resume_text.startswith("Error"):
             return render(request, 'resume_matcher/upload.html', {'error': resume_text})
 
-        # Get LinkedIn job titles
-        scraped_jobs = scrape_linkedin_jobs()
-        job_titles = [job['title'] for job in scraped_jobs]
+        matched_jobs = match_resume_with_jobs(resume_text)
 
-        # Match resume with job titles
-        matches = match_resume_with_job_titles(resume_text, job_titles)
-
-        return render(request, 'resume_matcher/result.html', {
-            'matches': matches
-        })
+        return render(request, 'resume_matcher/result.html', {'matches': matched_jobs})
 
     return render(request, 'resume_matcher/upload.html')
+
+def upload_resume_view(request):
+    if request.method == 'POST' and request.FILES.get('resume'):
+        resume_file = request.FILES['resume']
+        resume_text = resume_file.read().decode('utf-8', errors='ignore')
+        matched_jobs = match_resume_with_jobs(resume_text)
+        return render(request, 'resumes/result.html', {
+            'jobs': matched_jobs,
+            'resume': resume_text,
+        })
+
+    return render(request, 'resumes/upload.html')
 
 class ResumeUploadView(APIView):
     def post(self, request):
