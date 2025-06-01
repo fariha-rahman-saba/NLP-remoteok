@@ -14,6 +14,7 @@ from .scraper import scrape_linkedin_jobs
 from .matcher import match_resume_with_jobs
 from django.core.exceptions import ValidationError
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -52,29 +53,43 @@ def extract_text_from_resume(file):
         raise ValidationError(f"Error extracting text: {str(e)}")
 
 def upload_resume_view(request):
-    if request.method == 'POST' and request.FILES.get('resume'):
-        try:
-            resume_file = request.FILES['resume']
-            logger.info(f"Processing uploaded file: {resume_file.name}")
-            
-            resume_text = extract_text_from_resume(resume_file)
-            logger.info(f"Successfully extracted text from resume")
-            
-            matched_jobs = match_resume_with_jobs(resume_text)
-            logger.info(f"Found {len(matched_jobs)} matching jobs")
-            
-            return render(request, 'resumes/result.html', {
-                'jobs': matched_jobs,
-                'resume': resume_text,
-            })
-        except ValidationError as e:
-            logger.error(f"Validation error: {str(e)}")
-            return render(request, 'resumes/upload.html', {'error': str(e)})
-        except Exception as e:
-            logger.error(f"Unexpected error: {str(e)}")
-            return render(request, 'resumes/upload.html', {'error': 'An unexpected error occurred.'})
-
-    return render(request, 'resumes/upload.html')
+    if request.method == 'POST':
+        form = ResumeUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                resume_file = form.cleaned_data['resume']
+                logger.info(f"Processing uploaded file: {resume_file.name} (Size: {resume_file.size} bytes)")
+                
+                resume_text = extract_text_from_resume(resume_file)
+                if not resume_text or len(resume_text.strip()) < 50:
+                    logger.error("Extracted text too short or empty")
+                    return render(request, 'resumes/upload.html', {
+                        'form': form,
+                        'error': 'Could not extract meaningful text from the resume. Please ensure the file is not corrupted.'
+                    })
+                
+                logger.info(f"Successfully extracted text from resume (Length: {len(resume_text)} characters)")
+                
+                matched_jobs = match_resume_with_jobs(resume_text)
+                logger.info(f"Found {len(matched_jobs)} matching jobs")
+                
+                return render(request, 'resumes/result.html', {
+                    'jobs': matched_jobs,
+                    'resume': resume_text,
+                })
+            except ValidationError as e:
+                logger.error(f"Validation error: {str(e)}")
+                return render(request, 'resumes/upload.html', {'form': form, 'error': str(e)})
+            except Exception as e:
+                logger.error(f"Unexpected error during resume processing: {str(e)}", exc_info=True)
+                return render(request, 'resumes/upload.html', {'form': form, 'error': f'An unexpected error occurred: {str(e)}'})
+        else:
+            logger.error(f"Form validation errors: {form.errors}")
+            return render(request, 'resumes/upload.html', {'form': form, 'error': 'Please correct the errors below.'})
+    else:
+        form = ResumeUploadForm()
+    
+    return render(request, 'resumes/upload.html', {'form': form})
 
 class ResumeUploadView(APIView):
     def post(self, request):

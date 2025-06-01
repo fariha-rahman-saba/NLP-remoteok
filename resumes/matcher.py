@@ -56,26 +56,182 @@ def clean_text_for_embedding(text):
     return text.strip()
 
 def extract_skills(text):
-    """Extract skills from text using a predefined list of common tech skills"""
-    common_skills = [
-        "python", "java", "javascript", "typescript", "react", "angular", "vue",
-        "node.js", "django", "flask", "spring", "express", "mongodb", "postgresql",
-        "mysql", "aws", "azure", "gcp", "docker", "kubernetes", "machine learning",
-        "ai", "data science", "devops", "ci/cd", "git", "agile", "scrum",
-        "rest api", "graphql", "microservices", "cloud", "security", "testing",
-        "frontend", "backend", "fullstack", "mobile", "ios", "android", "swift",
-        "kotlin", "php", "ruby", "rails", "go", "rust", "c++", "c#", ".net"
-    ]
+    """Extract skills from text using a comprehensive list of tech skills"""
+    common_skills = {
+        # Programming Languages
+        "python", "java", "javascript", "typescript", "c++", "c#", "ruby", "php", "go", "rust", "swift", "kotlin",
+        "scala", "r", "matlab", "perl", "haskell", "elixir", "clojure", "dart",
+        
+        # Web Development
+        "html", "css", "react", "angular", "vue", "svelte", "next.js", "nuxt.js", "gatsby", "jquery", "bootstrap",
+        "tailwind", "sass", "less", "webpack", "vite", "rollup", "babel", "es6", "typescript",
+        
+        # Backend & Frameworks
+        "node.js", "express", "django", "flask", "fastapi", "spring", "laravel", "rails", "asp.net", "gin",
+        "echo", "fiber", "rocket", "actix", "phoenix", "play", "ktor",
+        
+        # Databases
+        "sql", "mysql", "postgresql", "mongodb", "redis", "cassandra", "elasticsearch", "dynamodb", "firebase",
+        "neo4j", "couchdb", "mariadb", "oracle", "sqlite", "graphql",
+        
+        # Cloud & DevOps
+        "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "ansible", "jenkins", "gitlab", "github",
+        "circleci", "travis", "heroku", "digitalocean", "cloudflare", "nginx", "apache",
+        
+        # AI & ML
+        "machine learning", "deep learning", "tensorflow", "pytorch", "keras", "scikit-learn", "numpy", "pandas",
+        "opencv", "nltk", "spacy", "huggingface", "transformers", "bert", "gpt", "computer vision",
+        "natural language processing", "nlp", "reinforcement learning", "data science",
+        
+        # Mobile Development
+        "ios", "android", "react native", "flutter", "xamarin", "ionic", "cordova", "swift", "kotlin",
+        "objective-c", "java android", "mobile development",
+        
+        # Security
+        "cybersecurity", "penetration testing", "ethical hacking", "security", "cryptography", "authentication",
+        "authorization",
+        
+        # Testing & QA
+        "unit testing", "integration testing", "e2e testing", "jest", "pytest", "junit", "selenium",
+        "cypress", "playwright", "testcafe", "qa", "quality assurance", "automated testing",
+        
+        # Methodologies & Tools
+        "agile", "scrum", "kanban", "devops", "ci/cd", "git", "svn", "jira", "confluence", "trello",
+        "asana", "monday", "notion", "figma", "sketch", "adobe xd", "photoshop", "illustrator",
+        
+        # Architecture & Design
+        "microservices", "rest api", "graphql", "soap", "grpc", "websocket", "message queue", "kafka",
+        "rabbitmq", "system design", "software architecture", "design patterns", "clean code",
+        "solid principles", "ddd", "tdd", "bdd",
+        
+        # Data & Analytics
+        "data analysis", "data visualization", "tableau", "power bi", "looker", "metabase", "superset",
+        "etl", "data warehousing", "big data", "hadoop", "spark", "kafka", "airflow", "dbt",
+        
+        # Blockchain
+        "blockchain", "ethereum", "solidity", "web3", "smart contracts", "defi", "nft", "cryptocurrency",
+        "bitcoin", "hyperledger", "consensus algorithms",
+        
+        # Game Development
+        "unity", "unreal engine", "game development", "3d modeling", "blender", "maya", "opengl",
+        "directx", "game design", "game programming",
+        
+        # Embedded & IoT
+        "embedded systems", "iot", "arduino", "raspberry pi", "fpga", "verilog", "vhdl", "microcontrollers",
+        "real-time systems", "firmware", "device drivers"
+    }
     
     text = text.lower()
-    found_skills = []
+    found_skills = set()
     
+    # Direct skill matching with word boundaries
     for skill in common_skills:
-        if skill in text:
-            found_skills.append(skill)
+        # Use word boundaries to ensure we match whole words
+        pattern = r'\b' + re.escape(skill) + r'\b'
+        if re.search(pattern, text):
+            found_skills.add(skill)
+    
+    # Pattern matching for specific variations only
+    patterns = {
+        r'\b(?:js|javascript)\b': 'javascript',
+        r'\b(?:ts|typescript)\b': 'typescript',
+        r'\b(?:py|python)\b': 'python',
+        r'\b(?:ml|machine learning)\b': 'machine learning',
+        r'\b(?:dl|deep learning)\b': 'deep learning',
+        r'\b(?:ai|artificial intelligence)\b': 'ai',
+        r'\b(?:devops|dev ops)\b': 'devops',
+        r'\b(?:ci/cd|ci cd|continuous integration)\b': 'ci/cd',
+        r'\b(?:aws|amazon web services)\b': 'aws',
+        r'\b(?:gcp|google cloud platform)\b': 'gcp',
+        r'\b(?:azure|microsoft azure)\b': 'azure',
+        r'\b(?:react|reactjs|react.js)\b': 'react',
+        r'\b(?:angular|angularjs|angular.js)\b': 'angular',
+        r'\b(?:vue|vuejs|vue.js)\b': 'vue',
+        r'\b(?:node|nodejs|node.js)\b': 'node.js',
+        r'\b(?:express|expressjs|express.js)\b': 'express',
+        r'\b(?:django|djangorest|django rest)\b': 'django',
+        r'\b(?:flask|flask-rest|flask rest)\b': 'flask',
+        r'\b(?:spring|spring boot|springboot)\b': 'spring',
+        r'\b(?:rails|ruby on rails)\b': 'rails',
+        r'\b(?:laravel|php laravel)\b': 'laravel',
+        r'\b(?:asp|asp.net|dotnet|.net)\b': '.net',
+        r'\b(?:postgres|postgresql|postgre)\b': 'postgresql',
+        r'\b(?:mongo|mongodb)\b': 'mongodb',
+        r'\b(?:redis|cache)\b': 'redis',
+        r'\b(?:elastic|elasticsearch)\b': 'elasticsearch',
+        r'\b(?:dynamo|dynamodb)\b': 'dynamodb',
+        r'\b(?:firebase|firestore)\b': 'firebase',
+        r'\b(?:neo4j|graph database)\b': 'neo4j',
+        r'\b(?:couch|couchdb)\b': 'couchdb',
+        r'\b(?:mariadb|mysql)\b': 'mysql',
+        r'\b(?:oracle|oracle db)\b': 'oracle',
+        r'\b(?:sqlite|sqlite3)\b': 'sqlite',
+        r'\b(?:graphql|gql)\b': 'graphql',
+        r'\b(?:docker|container)\b': 'docker',
+        r'\b(?:k8s|kubernetes)\b': 'kubernetes',
+        r'\b(?:terraform|infrastructure as code)\b': 'terraform',
+        r'\b(?:ansible|automation)\b': 'ansible',
+        r'\b(?:jenkins|ci server)\b': 'jenkins',
+        r'\b(?:gitlab|git lab)\b': 'gitlab',
+        r'\b(?:github|git hub)\b': 'github',
+        r'\b(?:circleci|circle ci)\b': 'circleci',
+        r'\b(?:travis|travis ci)\b': 'travis',
+        r'\b(?:heroku|heroku platform)\b': 'heroku',
+        r'\b(?:digitalocean|digital ocean)\b': 'digitalocean',
+        r'\b(?:cloudflare|cloud flare)\b': 'cloudflare',
+        r'\b(?:nginx|web server)\b': 'nginx',
+        r'\b(?:apache|web server)\b': 'apache',
+        r'\b(?:tensorflow|tf)\b': 'tensorflow',
+        r'\b(?:pytorch|torch)\b': 'pytorch',
+        r'\b(?:keras|deep learning)\b': 'keras',
+        r'\b(?:scikit|scikit-learn)\b': 'scikit-learn',
+        r'\b(?:numpy|numerical python)\b': 'numpy',
+        r'\b(?:pandas|data analysis)\b': 'pandas',
+        r'\b(?:opencv|computer vision)\b': 'opencv',
+        r'\b(?:nltk|natural language)\b': 'nltk',
+        r'\b(?:spacy|nlp)\b': 'spacy',
+        r'\b(?:huggingface|transformers)\b': 'huggingface',
+        r'\b(?:bert|transformer)\b': 'bert',
+        r'\b(?:gpt|generative)\b': 'gpt',
+        r'\b(?:cv|computer vision)\b': 'computer vision',
+        r'\b(?:nlp|natural language)\b': 'natural language processing',
+        r'\b(?:rl|reinforcement)\b': 'reinforcement learning',
+        r'\b(?:ds|data science)\b': 'data science',
+        r'\b(?:react native|react-native)\b': 'react native',
+        r'\b(?:flutter|mobile)\b': 'flutter',
+        r'\b(?:xamarin|mobile)\b': 'xamarin',
+        r'\b(?:ionic|mobile)\b': 'ionic',
+        r'\b(?:cordova|phonegap)\b': 'cordova',
+        r'\b(?:swift|ios)\b': 'swift',
+        r'\b(?:kotlin|android)\b': 'kotlin',
+        r'\b(?:objective-c|objc)\b': 'objective-c',
+        r'\b(?:java android|android)\b': 'java android',
+        r'\b(?:mobile dev|mobile development)\b': 'mobile development',
+        r'\b(?:cyber|cybersecurity)\b': 'cybersecurity',
+        r'\b(?:pentest|penetration)\b': 'penetration testing',
+        r'\b(?:hacking|ethical)\b': 'ethical hacking',
+        r'\b(?:sec|security)\b': 'security',
+        r'\b(?:crypto|cryptography)\b': 'cryptography',
+        r'\b(?:auth|authentication)\b': 'authentication',
+        r'\b(?:authz|authorization)\b': 'authorization',
+        r'\b(?:oauth|openid)\b': 'oauth',
+        r'\b(?:jwt|json web token)\b': 'jwt',
+        r'\b(?:ssl|tls)\b': 'ssl',
+        r'\b(?:encrypt|encryption)\b': 'encryption',
+        r'\b(?:fw|firewall)\b': 'firewall',
+        r'\b(?:vpn|virtual private)\b': 'vpn',
+        r'\b(?:unit test|unit testing)\b': 'unit testing',
+        r'\b(?:integration test|integration testing)\b': 'integration testing',
+        r'\b(?:e2e|end to end)\b': 'e2e testing',
+        r'\b(?:automated test|automated testing)\b': 'automated testing'
+    }
+    
+    for pattern, skill in patterns.items():
+        if re.search(pattern, text):
+            found_skills.add(skill)
     
     logger.info(f"Found skills: {found_skills}")
-    return found_skills
+    return list(found_skills)
 
 def match_resume_with_jobs(resume_text, threshold=0.0):  # Set threshold to 0 to show all jobs
     try:
@@ -121,8 +277,24 @@ def match_resume_with_jobs(resume_text, threshold=0.0):  # Set threshold to 0 to
             skill_match_percentage = len(matching_skills) / len(job_skills) if job_skills else 0
             logger.info(f"Skill match percentage: {skill_match_percentage:.3f}")
             
-            # Combine similarity score with skill match
-            final_score = (similarity * 0.7) + (skill_match_percentage * 0.3)
+            # Calculate required skills percentage
+            required_skills_percentage = len(job_skills) / 20 if job_skills else 0  # Assuming max 20 required skills
+            logger.info(f"Required skills percentage: {required_skills_percentage:.3f}")
+            
+            # Calculate skill coverage
+            skill_coverage = len(matching_skills) / max(len(resume_skills), 1)
+            logger.info(f"Skill coverage: {skill_coverage:.3f}")
+            
+            # Combine scores with new weights:
+            # - 70% skill matching (importance of matching required skills)
+            # - 20% semantic similarity (context and related skills)
+            # - 10% skill coverage (how many of your skills are utilized)
+            final_score = (
+                (skill_match_percentage * 0.7) +  # How well you match the required skills
+                (similarity * 0.2) +              # Semantic similarity for context
+                (skill_coverage * 0.1)            # How many of your skills are used
+            )
+            
             logger.info(f"Final score: {final_score:.3f}")
             
             # Add all jobs with their scores
@@ -136,7 +308,10 @@ def match_resume_with_jobs(resume_text, threshold=0.0):  # Set threshold to 0 to
                 "required_skills": list(job_skills),
                 "location": job.get('location', 'Remote'),
                 "salary": job.get('salary', ''),
-                "date": job.get('date', '')
+                "date": job.get('date', ''),
+                "skill_match_percentage": round(skill_match_percentage * 100, 2),
+                "semantic_similarity": round(similarity * 100, 2),
+                "skill_coverage": round(skill_coverage * 100, 2)
             })
 
         # Sort by score and date
